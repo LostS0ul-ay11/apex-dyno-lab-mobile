@@ -475,17 +475,23 @@
     });
 
     if (pwaInstallBtn) {
-      pwaInstallBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
+      const handleInstall = async (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         if (deferredPrompt) {
           deferredPrompt.prompt();
           const { outcome } = await deferredPrompt.userChoice;
           console.log('[PWA] User choice:', outcome);
           deferredPrompt = null;
         } else {
-          alert('Para instalar no celular:\n• No Chrome: toque nos 3 pontinhos (⋮) no topo e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".\n• No iPhone (Safari): toque no botão Compartilhar e escolha "Adicionar à Tela de Início".');
+          alert('COMO INSTALAR NO CELULAR:\n\n1. No Chrome: toque nos 3 pontinhos (⋮) no topo direito do navegador.\n2. Escolha "Instalar aplicativo" ou "Adicionar à tela inicial".\n\n(No iPhone / Safari: toque no botão Compartilhar e selecione "Adicionar à Tela de Início")');
         }
-      });
+      };
+
+      pwaInstallBtn.addEventListener('click', handleInstall);
+      pwaInstallBtn.addEventListener('touchstart', handleInstall, { passive: false });
     }
   </script>
 </body>

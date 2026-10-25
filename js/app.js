@@ -205,14 +205,26 @@ class ApexDynoApp {
     // Start / Ignition Button
     const startBtn = document.getElementById('btnStartEngine');
     const startOverlay = document.getElementById('startOverlay');
+    const startMainBtn = document.getElementById('startMainBtn');
 
-    const triggerStart = () => {
+    const triggerStart = (e) => {
+      if (e) {
+        // Do not trigger start if clicking on the install button inside the overlay
+        if (e.target && (e.target.id === 'pwaInstallBtn' || e.target.closest('#pwaInstallBtn'))) {
+          return;
+        }
+        e.preventDefault();
+      }
+
       if (!this.isEngineRunning) {
         window.engineAudio.initContext();
         this.isEngineRunning = true;
         this.loadEngineConfiguration();
 
-        if (startOverlay) startOverlay.classList.add('hidden');
+        if (startOverlay) {
+          startOverlay.classList.add('hidden');
+          startOverlay.style.display = 'none';
+        }
         if (startBtn) {
           startBtn.classList.add('running');
           startBtn.innerHTML = '<span>⚡</span> MOTOR LIGADO (DESLIGAR)';
@@ -227,8 +239,19 @@ class ApexDynoApp {
       }
     };
 
-    if (startBtn) startBtn.addEventListener('click', triggerStart);
-    if (startOverlay) startOverlay.addEventListener('click', triggerStart);
+    window.triggerEngineStart = triggerStart;
+
+    if (startBtn) {
+      startBtn.addEventListener('click', triggerStart);
+      startBtn.addEventListener('touchstart', triggerStart, { passive: false });
+    }
+    if (startMainBtn) {
+      startMainBtn.addEventListener('click', triggerStart);
+      startMainBtn.addEventListener('touchstart', triggerStart, { passive: false });
+    }
+    if (startOverlay) {
+      startOverlay.addEventListener('click', triggerStart);
+    }
 
     // Interactive Gas Pedal (Hold to accelerate)
     const gasPedal = document.getElementById('gasPedal');
