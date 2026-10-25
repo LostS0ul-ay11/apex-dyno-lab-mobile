@@ -1,14 +1,15 @@
-const CACHE_NAME = 'apex-dyno-mobile-v2';
+const CACHE_NAME = 'apex-dyno-v10';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
   'manifest.json',
-  'css/mobile.css?v=5',
-  'js/engine-data.js?v=5',
-  'js/engine-audio.js?v=5',
-  'js/physics.js?v=5',
-  'js/mobile-gauges.js?v=5',
-  'js/mobile-app.js?v=5',
+  'css/style.css?v=10',
+  'js/engine-data.js?v=10',
+  'js/engine-audio.js?v=10',
+  'js/physics.js?v=10',
+  'js/gauges.js?v=10',
+  'js/visualizer.js?v=10',
+  'js/app.js?v=10',
   'icons/icon-192.png',
   'icons/icon-512.png'
 ];
@@ -16,7 +17,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching assets');
+      console.log('[SW] Caching shell assets');
       return cache.addAll(ASSETS_TO_CACHE).catch(err => {
         console.warn('[SW] Cache addAll warning:', err);
       });
@@ -31,7 +32,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', key);
+            console.log('[SW] Removing old cache:', key);
             return caches.delete(key);
           }
         })

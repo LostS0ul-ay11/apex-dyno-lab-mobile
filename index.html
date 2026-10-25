@@ -3,452 +3,490 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Apex Dyno Lab Mobile</title>
-
-  <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="#080b10">
+  <title>Apex Dyno Lab - Simulador de Motores</title>
+  <meta name="theme-color" content="#06080d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Apex Dyno Lab">
-  <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/mobile.css?v=6">
-
-  <style>
-    /* In-page install banner styling */
-    .install-banner {
-      width: 100%;
-      max-width: 320px;
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.15));
-      border: 1px solid rgba(0, 240, 255, 0.4);
-      border-radius: 14px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      text-align: center;
-      margin-top: 6px;
-    }
-    .install-banner-btn {
-      background: linear-gradient(135deg, #00f0ff, #3b82f6);
-      color: #000;
-      font-weight: 900;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-    }
-    .install-banner-desc {
-      font-size: 11px;
-      color: #9ca3af;
-      line-height: 1.4;
-    }
-    .install-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 999;
-      padding: 24px;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .install-modal.active { display: flex; }
-    .install-modal-card {
-      background: #0d1117;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 20px;
-      max-width: 320px;
-      width: 100%;
-      text-align: left;
-    }
-    .install-modal-title {
-      font-size: 16px;
-      font-weight: 900;
-      color: #00f0ff;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .install-step {
-      font-size: 13px;
-      color: #e8eaf0;
-      margin-bottom: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-    .install-step-num {
-      background: rgba(255,107,0,0.2);
-      color: #ff6b00;
-      font-weight: 900;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 11px;
-    }
-  </style>
+  <meta name="description" content="Simulador de motores automotivos 100% funcional com síntese acústica procedural em tempo real: Motores em Linha, V, Boxer, Rotativo Wankel, VR e W com turbos, superchargers e telemetria completa.">
+  <link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
-  <!-- START OVERLAY -->
-  <div id="startOverlay">
-    <div class="overlay-logo">⚡</div>
-    <div class="overlay-title">APEX DYNO LAB</div>
-    <div class="overlay-version">v3.0 — MOBILE PWA</div>
-    <div class="overlay-desc">Simulador Acústico & Dinamômetro Portátil com física realista de motor.</div>
-    
-    <button id="startAppBtn" class="start-btn">⚡ LIGAR MOTOR</button>
 
-    <!-- PROMINENT DIRECT INSTALL BANNER -->
-    <div class="install-banner" id="pwaInstallBanner">
-      <button id="btnPwaInstall" class="install-banner-btn">
-        <span>📲</span>
-        <span id="installBtnText">INSTALAR COMO JOGO</span>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h1>Apex Dyno Lab</h1>
+        <span>Simulador Acústico & Físico de Motores</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="btnStartEngine" class="btn-start-engine" title="Ligar ou Desligar Motor">
+        <span>⚡</span> DAR PARTIDA NO MOTOR
       </button>
-      <div class="install-banner-desc" id="installBannerDesc">
-        Instale na sua tela inicial para jogar em tela cheia sem barras de navegador!
+
+      <button id="btnUnitToggle" class="btn-unit-toggle" title="Alternar Unidade de Velocidade">KM/H</button>
+
+      <div class="vol-control">
+        <span>🔊</span>
+        <input type="range" id="volSlider" min="0" max="100" value="85" title="Volume Geral">
       </div>
     </div>
+  </header>
 
-    <div class="start-hint">🎧 Conecte fones para sentir os graves do escape</div>
-  </div>
+  <!-- MAIN CONTAINER -->
+  <main class="app-container">
 
-  <!-- HOW TO INSTALL MODAL (FOR PHONES WITHOUT AUTO PROMPT) -->
-  <div id="installGuideModal" class="install-modal">
-    <div class="install-modal-card">
-      <div class="install-modal-title">
-        <span>📲 Como Instalar o Jogo</span>
-        <button id="closeGuideBtn" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;">✕</button>
-      </div>
-      <div class="install-step">
-        <div class="install-step-num">1</div>
-        <div>No topo direito do navegador, toque no menu de <strong>3 pontinhos (⋮)</strong> no Chrome ou no botão de <strong>Compartilhar (⎋)</strong> no Safari.</div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-num">2</div>
-        <div>Procure e toque na opção <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-num">3</div>
-        <div>Pronto! O ícone do jogo aparecerá na tela do seu celular e rodará como um app nativo em tela cheia!</div>
-      </div>
-      <button id="guideGotItBtn" class="install-banner-btn" style="width:100%;margin-top:10px;">ENTENDI!</button>
-    </div>
-  </div>
+    <!-- LEFT COLUMN: INSTRUMENTS, VISUALIZER & PEDALS -->
+    <section class="cockpit-stage">
 
-  <!-- MAIN APP SHELL -->
-  <div id="app">
-    <!-- TOPBAR -->
-    <div id="topbar">
-      <div class="brand">
-        <div class="brand-icon">⚡</div>
-        <div>
-          <div class="brand-name">APEX DYNO</div>
-          <div class="brand-ver">MOBILE v3.0</div>
+      <!-- GAUGES PANEL -->
+      <div class="gauges-panel">
+        <!-- Speedometer -->
+        <div class="gauge-wrapper">
+          <canvas id="speedCanvas"></canvas>
+          <div class="gauge-label">Velocímetro</div>
         </div>
-      </div>
-      <div class="top-right">
-        <button id="topbarInstallBtn" class="btn-icon" title="Instalar Aplicativo">📲</button>
-        <button id="btnTopIgnition" class="btn-icon active" title="Ignição">🔥</button>
-      </div>
-    </div>
 
-    <!-- SHIFT LIGHTS -->
-    <div id="shift-lights">
-      <div class="shift-led" id="led-0"></div>
-      <div class="shift-led" id="led-1"></div>
-      <div class="shift-led" id="led-2"></div>
-      <div class="shift-led" id="led-3"></div>
-      <div class="shift-led" id="led-4"></div>
-      <div class="shift-led" id="led-5"></div>
-      <div class="shift-led" id="led-6"></div>
-      <div class="shift-led" id="led-7"></div>
-      <div class="shift-led" id="led-8"></div>
-      <div class="shift-led" id="led-9"></div>
-      <div class="shift-led" id="led-10"></div>
-      <div class="shift-led" id="led-11"></div>
-    </div>
+        <!-- Tachometer (RPM & Gear) -->
+        <div class="gauge-wrapper tach-wrapper">
+          <canvas id="tachCanvas"></canvas>
+          <div class="gauge-label">Conta-Giros (RPM)</div>
+        </div>
 
-    <!-- MAIN COCKPIT AREA -->
-    <div id="main-area">
-      <!-- ENGINE INFO -->
-      <div id="engine-info">
-        <div id="engine-name">2JZ-GTE Twin Turbo</div>
-        <div id="engine-stats">
-          <div class="e-stat">POTÊNCIA: <span id="info-hp">320 CV</span></div>
-          <div class="e-stat">CORTE: <span id="info-redline">8200 RPM</span></div>
-          <div class="e-stat">BOOST: <span id="info-boost">1.8 BAR</span></div>
+        <!-- Turbo Boost Gauge -->
+        <div class="gauge-wrapper">
+          <canvas id="boostCanvas"></canvas>
+          <div class="gauge-label">Pressão de Turbo (Boost)</div>
         </div>
       </div>
 
-      <!-- GAUGE CLUSTER -->
-      <div id="gauge-cluster">
-        <canvas id="tachCanvas" class="gauge-canvas" width="145" height="145"></canvas>
-        <canvas id="speedCanvas" class="gauge-canvas" width="145" height="145"></canvas>
-      </div>
-
-      <!-- TELEMETRY STRIP -->
-      <div id="telemetry-strip">
-        <div class="tele-badge">
-          <div class="tele-label">Potência</div>
-          <div class="tele-value" id="teleHp">0 CV</div>
+      <!-- LIVE TELEMETRY STRIP -->
+      <div class="telemetry-strip">
+        <div class="telemetry-badge">
+          <div class="tele-title">Potência Atual</div>
+          <div id="liveHp" class="tele-val accent-red">0 HP</div>
         </div>
-        <div class="tele-badge">
-          <div class="tele-label">Torque</div>
-          <div class="tele-value" id="teleTq">0 Nm</div>
+        <div class="telemetry-badge">
+          <div class="tele-title">Torque Atual</div>
+          <div id="liveTq" class="tele-val accent-cyan">0 Nm</div>
         </div>
-        <div class="tele-badge">
-          <div class="tele-label">Turbo</div>
-          <div class="tele-value" id="teleBoost">0.00 Bar</div>
+        <div class="telemetry-badge">
+          <div class="tele-title">Temp. EGT (Escape)</div>
+          <div id="liveEgt" class="tele-val accent-amber">450 °C</div>
         </div>
-        <div class="tele-badge">
-          <div class="tele-label">Velocidade</div>
-          <div class="tele-value" id="teleSpeed">0 km/h</div>
+        <div class="telemetry-badge">
+          <div class="tele-title">Pressão de Óleo</div>
+          <div id="liveOil" class="tele-val">45 PSI</div>
+        </div>
+        <div class="telemetry-badge">
+          <div class="tele-title">Sonda AFR (Mistura)</div>
+          <div id="liveAfr" class="tele-val">14.7</div>
         </div>
       </div>
 
-      <!-- GEAR INDICATOR STRIP -->
-      <div id="gear-strip">
-        <div class="gear-pill" id="shiftDownBtn">▼ DOWN</div>
-        <div id="gear-display">N</div>
-        <div class="gear-pill" id="shiftNeutralBtn">N</div>
-        <div class="gear-pill" id="shiftUpBtn">UP ▲</div>
-        <div id="shift-indicator">SHIFT</div>
-      </div>
-
-      <!-- CONTROLS -->
-      <div id="controls-section">
-        <!-- THROTTLE SLIDER -->
-        <div id="throttle-row">
-          <label>ACELERADOR</label>
-          <input type="range" id="throttleSlider" min="0" max="100" value="0">
-          <div id="throttle-pct">0%</div>
-        </div>
-
-        <!-- ACTION BUTTONS -->
-        <div id="action-row">
-          <button id="btnActionNos" class="action-btn cyan-btn">
-            <span class="a-icon">🧪</span>
-            <span>NITRO</span>
-          </button>
-          <button id="btnAction2Step" class="action-btn red-btn">
-            <span class="a-icon">💥</span>
-            <span>2-STEP</span>
-          </button>
-          <button id="btnActionWot" class="action-btn yellow-btn">
-            <span class="a-icon">⚡</span>
-            <span>W.O.T</span>
-          </button>
-          <button id="btnActionPurge" class="action-btn green-btn">
-            <span class="a-icon">💨</span>
-            <span>PURGE</span>
-          </button>
-        </div>
-
-        <!-- PEDALS -->
-        <div id="pedal-row">
-          <div id="pedalClutch" class="pedal-btn">
-            <div class="pedal-icon">🟣</div>
-            <div>EMBREAGEM</div>
-          </div>
-          <div id="pedalBrake" class="pedal-btn">
-            <div class="pedal-icon">🛑</div>
-            <div>FREIO</div>
-          </div>
-          <div id="pedalGas" class="pedal-btn">
-            <div class="pedal-icon">⚡</div>
-            <div>ACELERAR</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTTOM NAVIGATION TABS -->
-    <div id="bottom-tabs">
-      <button class="tab-btn active" data-tab="cockpit">
-        <span class="tab-icon">🏎️</span>
-        <span>Cockpit</span>
-      </button>
-      <button class="tab-btn" data-tab="garage">
-        <span class="tab-icon">🔧</span>
-        <span>Garagem</span>
-      </button>
-      <button class="tab-btn" data-tab="nos">
-        <span class="tab-icon">🧪</span>
-        <span>Nitro Lab</span>
-      </button>
-      <button class="tab-btn" data-tab="settings">
-        <span class="tab-icon">⚙️</span>
-        <span>Ajustes</span>
-      </button>
-    </div>
-
-    <!-- 1. GARAGE PANEL OVERLAY -->
-    <div id="panel-garage" class="panel">
-      <div class="panel-header">
-        <div class="panel-title">🔧 GARAGEM & PREPARAÇÃO</div>
-        <div class="panel-close" id="closeGarageBtn">✕</div>
-      </div>
-      <div class="panel-body">
-        <div class="form-section">
-          <div class="form-section-title">Motor</div>
-          <div class="form-row">
-            <select id="engineSelect" class="m-select"></select>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Indução Forçada</div>
-          <div class="form-row">
-            <select id="inductionSelect" class="m-select"></select>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Pressão de Turbo (Wastegate)</div>
-          <div class="form-row">
-            <div class="form-label">Pressão Alvo</div>
-            <div class="form-value" id="wastegateVal">1.8 BAR</div>
-          </div>
-          <div class="form-row">
-            <input type="range" id="wastegateSlider" class="m-slider" min="0.3" max="4.0" step="0.1" value="1.8">
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Comando de Válvulas</div>
-          <div class="form-row">
-            <select id="camSelect" class="m-select"></select>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Sistema de Escape</div>
-          <div class="form-row">
-            <select id="exhaustSelect" class="m-select"></select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. NITRO LAB PANEL OVERLAY -->
-    <div id="panel-nos" class="panel">
-      <div class="panel-header">
-        <div class="panel-title">🧪 LABORATÓRIO DE NITRO (NOS)</div>
-        <div class="panel-close" id="closeNosBtn">✕</div>
-      </div>
-      <div class="panel-body">
-        <div class="nos-bottle">
-          <div class="nos-title">SISTEMA NITROSO N₂O</div>
-          <div class="nos-power-badge" id="nosHeaderHp">+300 HP</div>
-          <div class="nos-bar-track">
-            <div id="nosBottleBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--cyan), var(--purple)); transition: width 0.1s;"></div>
-          </div>
-          <div style="font-size: 11px; color: var(--cyan); font-family: var(--mono);" id="nosBottlePct">GARRAFA 100%</div>
-        </div>
-
-        <div class="form-section">
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Uso de Nitro Infinito</div>
-              <div style="font-size: 10px; color: var(--text-dim);">A garrafa não esvazia ao disparar</div>
+      <!-- VISUALIZER & DYNO ROW -->
+      <div class="visualizer-dyno-row">
+        <!-- Engine Mechanics Animated Schematic -->
+        <div class="dyno-card">
+          <div class="dyno-card-header">
+            <div class="dyno-card-title">
+              <span>⚙️</span> Mecânica Interna & Combustão
             </div>
-            <label class="m-toggle">
-              <input type="checkbox" id="nosInfiniteToggle">
-              <span class="m-toggle-slider"></span>
-            </label>
+            <span style="font-size: 11px; color: var(--accent-cyan);">TEMPO REAL</span>
           </div>
+          <canvas id="mechCanvas"></canvas>
         </div>
 
-        <div class="form-section">
-          <div class="form-section-title">Potência do Disparo</div>
-          <div class="form-row">
-            <div class="form-label">Disparo Adicional</div>
-            <div class="form-value" id="nosShotVal">+300 HP</div>
+        <!-- Dyno Curve Power Graph -->
+        <div class="dyno-card">
+          <div class="dyno-card-header">
+            <div class="dyno-card-title">
+              <span>📈</span> Curva de Potência & Torque (Dinamômetro)
+            </div>
+            <span style="font-size: 11px; color: var(--accent-red);">DYNO RUN</span>
           </div>
-          <div class="form-row">
-            <input type="range" id="nosShotSlider" class="m-slider" min="50" max="1500" step="25" value="300">
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="form-section-title">Presets Rápidos</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 10px;">
-            <button class="gear-pill nos-preset-btn" data-hp="75">+75 HP</button>
-            <button class="gear-pill nos-preset-btn" data-hp="150">+150 HP</button>
-            <button class="gear-pill nos-preset-btn active" data-hp="300">+300 HP</button>
-            <button class="gear-pill nos-preset-btn" data-hp="500">+500 HP</button>
-            <button class="gear-pill nos-preset-btn" data-hp="1000">+1000 HP</button>
-            <button class="gear-pill nos-preset-btn" data-hp="1500">+1500 HP</button>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <button id="nosPurgeBtn" class="action-btn cyan-btn" style="padding: 12px;">💨 PURGAR (ESPIRRO)</button>
-          <button id="nosRefillBtn" class="action-btn green-btn" style="padding: 12px;">🔄 REABASTECER</button>
+          <canvas id="dynoCanvas"></canvas>
         </div>
       </div>
-    </div>
 
-    <!-- 3. SETTINGS PANEL OVERLAY -->
-    <div id="panel-settings" class="panel">
-      <div class="panel-header">
-        <div class="panel-title">⚙️ AJUSTES & CONFIGURAÇÃO</div>
-        <div class="panel-close" id="closeSettingsBtn">✕</div>
-      </div>
-      <div class="panel-body">
-        <div class="form-section">
-          <div class="toggle-row">
-            <div class="toggle-label">Vibração Háptica</div>
-            <label class="m-toggle">
-              <input type="checkbox" id="settingHaptics" checked>
-              <span class="m-toggle-slider"></span>
-            </label>
+      <!-- COCKPIT CONTROLS & PEDALS -->
+      <div class="cockpit-controls">
+        <!-- Pedals Assembly -->
+        <div class="pedals-assembly">
+          <!-- Clutch Pedal -->
+          <div class="pedal-col">
+            <div class="pedal-label">Embreagem</div>
+            <button id="clutchPedal" class="pedal-btn clutch-pedal">
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <span class="pedal-hotkey">C</span>
+            </button>
           </div>
-        </div>
 
-        <div class="form-section">
-          <div class="form-section-title">Instalação no Celular</div>
-          <div style="padding: 14px; display: flex; flex-direction: column; gap: 10px;">
-            <p style="font-size: 12px; color: var(--text-dim); line-height: 1.5;">
-              Instale o Apex Dyno como um jogo nativo para abrir em tela cheia com alta taxa de quadros e sem barras do navegador.
-            </p>
-            <button id="settingsInstallBtn" class="install-banner-btn" style="width: 100%;">
-              📲 INSTALAR APLICATIVO AGORA
+          <!-- Brake Pedal -->
+          <div class="pedal-col">
+            <div class="pedal-label">Freio</div>
+            <button id="brakePedal" class="pedal-btn brake-pedal">
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <span class="pedal-hotkey">S / ↓</span>
+            </button>
+          </div>
+
+          <!-- Gas / Throttle Pedal -->
+          <div class="pedal-col">
+            <div class="pedal-label" style="color: var(--accent-cyan);">Acelerador</div>
+            <button id="gasPedal" class="pedal-btn gas-pedal">
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <div class="pedal-grip"></div>
+              <span class="pedal-hotkey">ESPAÇO / W</span>
+            </button>
+          </div>
+
+          <!-- Throttle Slider & Dyno Pull Button -->
+          <div class="pedal-col" style="margin-left: 12px; gap: 6px;">
+            <div class="pedal-label">Acelerador Fixo</div>
+            <input type="range" id="throttleSlider" min="0" max="100" value="0" style="height: 95px; writing-mode: vertical-lr; direction: rtl; cursor: pointer;">
+            <button id="btnWotPull" class="action-pill-btn" style="padding: 6px 8px; font-size: 11px; width: 100%; white-space: nowrap;" title="Travar acelerador a 100% para teste de dinamômetro">
+              🚀 WOT 100%
             </button>
           </div>
         </div>
+
+        <!-- Transmission & Adders -->
+        <div class="transmission-console">
+          <!-- H-Pattern / Gear Shifter Buttons -->
+          <div class="gear-selector-grid">
+            <button class="gear-btn" data-gear="-1" title="Marcha Ré">R</button>
+            <button class="gear-btn active" data-gear="0" title="Ponto Morto (Neutro)">N</button>
+            <button class="gear-btn" data-gear="1">1</button>
+            <button class="gear-btn" data-gear="2">2</button>
+            <button class="gear-btn" data-gear="3">3</button>
+            <button class="gear-btn" data-gear="4">4</button>
+            <button class="gear-btn" data-gear="5">5</button>
+            <button class="gear-btn" data-gear="6">6</button>
+            <button class="gear-btn" data-gear="7">7</button>
+          </div>
+
+          <div class="gear-shift-arrows">
+            <button id="btnShiftDown" class="action-pill-btn" title="Reduzir Marcha">
+              <span>▼</span> Reduzir (Q)
+            </button>
+            <button id="btnShiftUp" class="action-pill-btn" title="Subir Marcha">
+              <span>▲</span> Subir (E)
+            </button>
+          </div>
+
+          <!-- 2-Step and NOS buttons -->
+          <div style="display: flex; gap: 10px;">
+            <button id="btnTwoStep" class="action-pill-btn" title="Ativar 2-Step Launch Control e Anti-Lag">
+              <span>🔥</span> 2-Step / ALS (L)
+            </button>
+            <button id="btnNos" class="action-pill-btn nos-btn" title="Injetar Óxido Nitroso (NOS 150HP)">
+              <span>⚡</span> Injetar Nitro (N)
+            </button>
+          </div>
+
+          <div class="nos-level-bar" title="Pressão do Cilindro de Nitrogênio">
+            <div id="nosBottleLevel" class="nos-level-fill"></div>
+          </div>
+        </div>
       </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN: TUNING & ENGINE SWAP GARAGE -->
+    <aside class="garage-panel">
+
+      <!-- GARAGE TAB NAVIGATION -->
+      <nav class="garage-tab-nav">
+        <button class="garage-tab-btn active" data-tab="tab-engines">
+          <span>🏎️</span> Motor
+        </button>
+        <button class="garage-tab-btn" data-tab="tab-induction">
+          <span>🌀</span> Turbos
+        </button>
+        <button class="garage-tab-btn nos-tab-badge" data-tab="tab-nos">
+          <span>⚡</span> Nitro (NOS)
+        </button>
+      </nav>
+
+      <!-- TAB 1: ENGINES & SPECS -->
+      <div id="tab-engines" class="tab-pane active">
+        <!-- ENGINE SWAP SELECTOR -->
+        <div class="tuning-card">
+          <div class="tuning-card-header">
+            <h2><span>🏎️</span> Swap de Motores</h2>
+            <span style="font-size: 11px; color: var(--accent-cyan);">DATABASE</span>
+          </div>
+
+          <div class="form-group">
+            <label for="engineSelect">Selecione o Motor</label>
+            <select id="engineSelect"></select>
+          </div>
+
+          <!-- Engine Spec Sheet Card -->
+          <div class="spec-sheet">
+            <div class="spec-sheet-header">
+              <h3 id="cardEngineName">Inline-4 2.0L VTEC</h3>
+              <p id="cardEngineFamily">K20A Style</p>
+            </div>
+            <div id="cardEngineDesc" class="spec-desc">
+              Motor de alta performance com rotação estendida.
+            </div>
+            <div class="spec-grid">
+              <div class="spec-box">
+                <span class="spec-box-label">POTÊNCIA</span>
+                <span id="cardPeakHp" class="spec-box-val accent-red">0 HP</span>
+              </div>
+              <div class="spec-box">
+                <span class="spec-box-label">TORQUE</span>
+                <span id="cardPeakTq" class="spec-box-val accent-cyan">0 Nm</span>
+              </div>
+              <div class="spec-box">
+                <span class="spec-box-label">CORTE GIRO</span>
+                <span id="cardRedline" class="spec-box-val">0 RPM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENGINE INTERNALS & EXHAUST -->
+        <div class="tuning-card">
+          <div class="tuning-card-header">
+            <h2><span>🛠️</span> Cabeçote & Escape</h2>
+            <span style="font-size: 11px; color: var(--text-muted);">INTERNOS</span>
+          </div>
+
+          <div class="form-group">
+            <label for="camSelect">Graduação de Comando de Válvulas</label>
+            <select id="camSelect"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="flywheelSelect">Inércia do Virabrequim / Volante</label>
+            <select id="flywheelSelect">
+              <option value="1.2">Volante Pesado OEM (Suave)</option>
+              <option value="1.0" selected>Volante Sport Street (Equilibrado)</option>
+              <option value="0.65">Volante Racing Billet Ultra-Leve (Giro Instantâneo)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="exhaustSelect">Sistema de Escapamento</label>
+            <select id="exhaustSelect"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: FORCED INDUCTION & UPGRADE SHOP -->
+      <div id="tab-induction" class="tab-pane">
+        <div class="tuning-card">
+          <div class="tuning-card-header">
+            <h2><span>🌀</span> Turbos & Superchargers</h2>
+            <span style="font-size: 11px; color: var(--accent-orange);">PERFORMANCE</span>
+          </div>
+
+          <div class="form-group">
+            <label for="inductionSelect">Sistema de Sobrealimentação</label>
+            <select id="inductionSelect"></select>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>Pressão da Wastegate (Boost)</span>
+              <span id="wastegateVal" class="slider-val-badge">1.5 Bar</span>
+            </label>
+            <div class="slider-row">
+              <input type="range" id="wastegateSlider" min="50" max="180" value="100">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: DEDICATED NITROUS OXIDE (NOS LAB) -->
+      <div id="tab-nos" class="tab-pane">
+        <!-- NITROUS CONTROLLER CARD -->
+        <div class="tuning-card nos-card-border">
+          <div class="tuning-card-header">
+            <h2><span>⚡</span> Laboratório de Nitro (NOS)</h2>
+            <button id="btnNosArmSwitch" class="nos-arm-toggle active" title="Armar ou desarmar sistema de Nitro">
+              ARMADO
+            </button>
+          </div>
+
+          <!-- Infinite Nitrous Toggle -->
+          <div class="nos-infinite-box">
+            <div class="nos-toggle-row">
+              <label class="nos-switch-label" for="chkInfiniteNos">
+                <input type="checkbox" id="chkInfiniteNos" checked>
+                <span class="nos-switch-custom"></span>
+                <span class="nos-switch-text">⚡ Uso Infinito de Nitro (Nunca Esvazia)</span>
+              </label>
+            </div>
+            <div class="nos-bottle-status">
+              <span>Pressão: <strong>1050 PSI</strong></span>
+              <span>Aquecedor: <strong style="color: #22c55e;">ATIVO</strong></span>
+              <span>Status: <strong style="color: var(--accent-cyan);">∞ ILIMITADO</strong></span>
+            </div>
+          </div>
+
+          <!-- Dynamic Shot Power Controller -->
+          <div class="form-group" style="margin-top: 6px;">
+            <label>
+              <span>Potência do Disparo (Shot Size)</span>
+              <span id="nosShotValBadge" class="slider-val-badge accent-cyan" style="font-size: 13px; font-weight: 700;">+300 HP</span>
+            </label>
+            <div class="nos-power-banner">
+              <div class="nos-power-big" id="nosPowerReadout">+300 HP</div>
+              <div class="nos-torque-sub" id="nosTorqueReadout">+406 Nm Torque Extra</div>
+            </div>
+            <div class="slider-row">
+              <input type="range" id="nosShotSlider" min="50" max="1500" step="25" value="300" style="accent-color: var(--accent-cyan);">
+            </div>
+          </div>
+
+          <!-- Fast Shot Presets -->
+          <div class="nos-presets-grid">
+            <button class="nos-preset-btn" data-shot="100">+100 HP<br><small>Street</small></button>
+            <button class="nos-preset-btn active" data-shot="300">+300 HP<br><small>Sport</small></button>
+            <button class="nos-preset-btn" data-shot="500">+500 HP<br><small>Pro Drag</small></button>
+            <button class="nos-preset-btn" data-shot="1000">+1000 HP<br><small>Outlaw</small></button>
+            <button class="nos-preset-btn" data-shot="1500" style="color: #f43f5e;">+1500 HP<br><small>Dyno Buster</small></button>
+          </div>
+
+          <!-- Trigger Mode & Delivery -->
+          <div class="form-group" style="margin-top: 6px;">
+            <label for="nosTriggerModeSelect">Modo de Acionamento</label>
+            <select id="nosTriggerModeSelect">
+              <option value="manual">🔘 Manual (Segure N ou botão de injeção)</option>
+              <option value="wot">🚀 Automático WOT (Injeta a 100% acelerador)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="nosDeliverySelect">Tipo de Injeção de Nitro</label>
+            <select id="nosDeliverySelect">
+              <option value="single_fogger">Single Fogger (Bico Único de Admissão)</option>
+              <option value="dual_wet">Dual Wet Fogger (Dois Bicos Úmidos)</option>
+              <option value="direct_port" selected>Direct Port Multi-Stage (Injeção Direta por Cilindro)</option>
+            </select>
+          </div>
+
+          <!-- Purge Valve Controls -->
+          <div class="nos-purge-box">
+            <button id="btnPurgeNos" class="btn-purge-action" title="Purgar vapor de alta pressão das linhas de nitro">
+              💨 PURGAR NITRO (PURGE)
+            </button>
+            <div class="purge-color-selector">
+              <span style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Cor do LED de Purga:</span>
+              <div class="purge-dots">
+                <span class="purge-dot active" data-color="#00f0ff" style="background: #00f0ff;" title="Ciano Gelo"></span>
+                <span class="purge-dot" data-color="#3b82f6" style="background: #3b82f6;" title="Azul Real"></span>
+                <span class="purge-dot" data-color="#ef4444" style="background: #ef4444;" title="Vermelho Fogo"></span>
+                <span class="purge-dot" data-color="#10b981" style="background: #10b981;" title="Verde Tóxico"></span>
+                <span class="purge-dot" data-color="#a855f7" style="background: #a855f7;" title="Roxo Plasma"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- KEYBOARD SHORTCUTS FOOTER -->
+  <footer class="shortcuts-legend">
+    <div class="shortcut-item">
+      <span class="kbd">ESPAÇO / W / ↑</span> <span>Acelerar</span>
+    </div>
+    <div class="shortcut-item">
+      <span class="kbd">S / ↓</span> <span>Frear</span>
+    </div>
+    <div class="shortcut-item">
+      <span class="kbd">C</span> <span>Embreagem</span>
+    </div>
+    <div class="shortcut-item">
+      <span class="kbd">E / Q</span> <span>Subir / Reduzir Marcha</span>
+    </div>
+    <div class="shortcut-item">
+      <span class="kbd">L</span> <span>2-Step Launch Control</span>
+    </div>
+    <div class="shortcut-item">
+      <span class="kbd">N</span> <span>Injeção de Óxido Nitroso (NOS)</span>
+    </div>
+  </footer>
+
+  <!-- START ENGINE MODAL OVERLAY -->
+  <div id="startOverlay" class="start-overlay">
+    <div class="start-overlay-box">
+      <div style="font-size: 44px;">🏁</div>
+      <h2>Apex Dyno Simulator</h2>
+      <div style="display:inline-block;background:linear-gradient(135deg,#ff6b00,#ffaa00);color:#000;font-size:11px;font-weight:800;letter-spacing:2px;padding:3px 14px;border-radius:20px;margin:6px 0 12px;text-transform:uppercase;box-shadow:0 0 14px rgba(255,107,0,0.6);">v3.0 — Ultra Realistic Audio</div>
+      <p>Simulador acústico com motores em Linha, V, Boxer, Rotativos, VR e W, turbos com Blow-Off Valve e superchargers.</p>
+      <button class="start-overlay-btn" id="startMainBtn">⚡ LIGAR MOTOR & INICIAR</button>
+      <button id="pwaInstallBtn" style="background: linear-gradient(135deg, #00f0ff, #3b82f6); color: #000; font-family: var(--font-display); font-size: 15px; font-weight: 800; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(0,240,255,0.4);">
+        <span>📲</span> <span id="pwaBtnText">INSTALAR NO CELULAR (APP)</span>
+      </button>
+      <span style="font-size: 11px; color: var(--text-dim);">Toque para desbloquear o motor e o sintetizador de áudio</span>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="js/engine-data.js?v=6"></script>
-  <script src="js/engine-audio.js?v=6"></script>
-  <script src="js/physics.js?v=6"></script>
-  <script src="js/mobile-gauges.js?v=6"></script>
-  <script src="js/mobile-app.js?v=6"></script>
+  <!-- SCRIPTS -->
+  <script src="js/engine-data.js?v=10"></script>
+  <script src="js/engine-audio.js?v=10"></script>
+  <script src="js/physics.js?v=10"></script>
+  <script src="js/gauges.js?v=10"></script>
+  <script src="js/visualizer.js?v=10"></script>
+  <script src="js/app.js?v=10"></script>
+  <script>
+    // PWA Service Worker & Install Handler
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js?v=10').then(reg => {
+          console.log('[PWA] SW registered:', reg.scope);
+        }).catch(err => {
+          console.log('[PWA] SW registration failed:', err);
+        });
+      });
+    }
+
+    let deferredPrompt = null;
+    const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+    const pwaBtnText = document.getElementById('pwaBtnText');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (pwaBtnText) pwaBtnText.textContent = 'INSTALAR AGORA (APP)';
+    });
+
+    if (pwaInstallBtn) {
+      pwaInstallBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log('[PWA] User choice:', outcome);
+          deferredPrompt = null;
+        } else {
+          alert('Para instalar no celular:\n• No Chrome: toque nos 3 pontinhos (⋮) no topo e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".\n• No iPhone (Safari): toque no botão Compartilhar e escolha "Adicionar à Tela de Início".');
+        }
+      });
+    }
+  </script>
 </body>
 </html>
