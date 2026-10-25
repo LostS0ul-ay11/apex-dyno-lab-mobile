@@ -1,6 +1,6 @@
 /**
  * APEX DYNO LAB - MOBILE CONTROLLER
- * Full touch interactions, haptic feedback, tab overlays, NOS lab and telemetry
+ * Full touch interactions, haptic feedback, tab overlays, NOS lab, telemetry and PWA installation prompt
  */
 class ApexMobileApp {
     constructor() {
@@ -20,9 +20,11 @@ class ApexMobileApp {
         this.twoStepPressed = false;
 
         this.activeTab = 'cockpit';
+        this.deferredPrompt = null;
     }
 
     init() {
+        this._bindPwaInstall();
         this._bindStartOverlay();
         this._initTabs();
         this._populateSelectors();
@@ -39,12 +41,61 @@ class ApexMobileApp {
         requestAnimationFrame(() => this._loop());
     }
 
+    _bindPwaInstall() {
+        const installBtn = document.getElementById('btnPwaInstall');
+        const topbarInstallBtn = document.getElementById('topbarInstallBtn');
+        const settingsInstallBtn = document.getElementById('settingsInstallBtn');
+        const guideModal = document.getElementById('installGuideModal');
+        const closeGuideBtn = document.getElementById('closeGuideBtn');
+        const guideGotItBtn = document.getElementById('guideGotItBtn');
+        const installBtnText = document.getElementById('installBtnText');
+
+        // Capture PWA install event from browser
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.deferredPrompt = e;
+            console.log('[PWA] beforeinstallprompt captured!');
+            if (installBtnText) installBtnText.textContent = 'INSTALAR JOGO AGORA';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('[PWA] App instalado com sucesso!');
+            this.deferredPrompt = null;
+            if (installBtnText) installBtnText.textContent = 'JOGO INSTALADO ✅';
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) banner.style.display = 'none';
+        });
+
+        const triggerInstall = async () => {
+            this._vibrate(25);
+            if (this.deferredPrompt) {
+                this.deferredPrompt.prompt();
+                const { outcome } = await this.deferredPrompt.userChoice;
+                console.log(`[PWA] Escolha do usuário: ${outcome}`);
+                this.deferredPrompt = null;
+            } else {
+                // If browser didn't fire event (iOS Safari, or already installed/in-app browser)
+                if (guideModal) guideModal.classList.add('active');
+            }
+        };
+
+        if (installBtn) installBtn.addEventListener('click', triggerInstall);
+        if (topbarInstallBtn) topbarInstallBtn.addEventListener('click', triggerInstall);
+        if (settingsInstallBtn) settingsInstallBtn.addEventListener('click', triggerInstall);
+
+        const closeGuide = () => {
+            if (guideModal) guideModal.classList.remove('active');
+        };
+        if (closeGuideBtn) closeGuideBtn.addEventListener('click', closeGuide);
+        if (guideGotItBtn) guideGotItBtn.addEventListener('click', closeGuide);
+    }
+
     _vibrate(pattern) {
         if (!this.hapticsEnabled || !navigator.vibrate) return;
         try {
             navigator.vibrate(pattern);
         } catch (e) {
-            // Ignored if browser restricts without user activation
+            // Ignored
         }
     }
 
@@ -71,9 +122,8 @@ class ApexMobileApp {
             this._vibrate([50, 40, 70]);
 
             if (overlay) {
-                overlay.style.opacity = '0';
-                overlay.style.pointerEvents = 'none';
-                setTimeout(() => overlay.remove(), 400);
+                overlay.classList.add('hidden');
+                setTimeout(() => overlay.remove(), 450);
             }
 
             this._updateEngineInfoDisplay();
@@ -125,21 +175,24 @@ class ApexMobileApp {
         });
 
         // Close buttons inside panel headers
-        document.querySelectorAll('.panel-close-btn').forEach(closeBtn => {
-            const close = (e) => {
-                e.preventDefault();
-                const panel = closeBtn.closest('.panel-overlay');
-                if (panel) panel.classList.remove('active');
-                tabBtns.forEach(b => {
-                    if (b.dataset.tab === 'cockpit') b.classList.add('active');
-                    else b.classList.remove('active');
-                });
-                this.activeTab = 'cockpit';
-                this._vibrate(15);
-            };
-            closeBtn.addEventListener('click', close);
-            closeBtn.addEventListener('touchstart', close, { passive: false });
-        });
+        const closePanel = (panelId) => {
+            const panel = document.getElementById(panelId);
+            if (panel) panel.classList.remove('active');
+            tabBtns.forEach(b => {
+                if (b.dataset.tab === 'cockpit') b.classList.add('active');
+                else b.classList.remove('active');
+            });
+            this.activeTab = 'cockpit';
+            this._vibrate(15);
+        };
+
+        const closeGarage = document.getElementById('closeGarageBtn');
+        const closeNos = document.getElementById('closeNosBtn');
+        const closeSettings = document.getElementById('closeSettingsBtn');
+
+        if (closeGarage) closeGarage.addEventListener('click', () => closePanel('panel-garage'));
+        if (closeNos) closeNos.addEventListener('click', () => closePanel('panel-nos'));
+        if (closeSettings) closeSettings.addEventListener('click', () => closePanel('panel-settings'));
     }
 
     _populateSelectors() {
@@ -197,14 +250,14 @@ class ApexMobileApp {
         const brakePedal = document.getElementById('pedalBrake');
         const clutchPedal = document.getElementById('pedalClutch');
         const throttleSlider = document.getElementById('throttleSlider');
-        const throttlePct = document.getElementById('throttlePct');
+        const throttlePct = document.getElementById('throttle-pct');
 
         // Gas Pedal (Touch & Hold)
         if (gasPedal) {
             const startGas = (e) => {
                 e.preventDefault();
                 this.gasPressed = true;
-                gasPedal.classList.add('pressed');
+                gasPedal.classList.add('active');
                 this._vibrate(25);
                 if (throttleSlider) throttleSlider.value = 100;
                 if (throttlePct) throttlePct.textContent = '100%';
@@ -213,7 +266,7 @@ class ApexMobileApp {
             const endGas = (e) => {
                 e.preventDefault();
                 this.gasPressed = false;
-                gasPedal.classList.remove('pressed');
+                gasPedal.classList.remove('active');
                 if (throttleSlider) throttleSlider.value = 0;
                 if (throttlePct) throttlePct.textContent = '0%';
                 if (this.physics) this.physics.setThrottle(0);
@@ -231,14 +284,14 @@ class ApexMobileApp {
             const startBrake = (e) => {
                 e.preventDefault();
                 this.brakePressed = true;
-                brakePedal.classList.add('pressed');
+                brakePedal.classList.add('active');
                 this._vibrate(20);
                 if (this.physics) this.physics.setBrake(1.0);
             };
             const endBrake = (e) => {
                 e.preventDefault();
                 this.brakePressed = false;
-                brakePedal.classList.remove('pressed');
+                brakePedal.classList.remove('active');
                 if (this.physics) this.physics.setBrake(0);
             };
             brakePedal.addEventListener('touchstart', startBrake, { passive: false });
@@ -253,14 +306,14 @@ class ApexMobileApp {
             const startClutch = (e) => {
                 e.preventDefault();
                 this.clutchPressed = true;
-                clutchPedal.classList.add('pressed');
+                clutchPedal.classList.add('active');
                 this._vibrate(20);
                 if (this.physics) this.physics.setClutch(1.0);
             };
             const endClutch = (e) => {
                 e.preventDefault();
                 this.clutchPressed = false;
-                clutchPedal.classList.remove('pressed');
+                clutchPedal.classList.remove('active');
                 if (this.physics) this.physics.setClutch(0);
             };
             clutchPedal.addEventListener('touchstart', startClutch, { passive: false });
@@ -321,7 +374,7 @@ class ApexMobileApp {
             neutralBtn.addEventListener('touchstart', handleNeutral, { passive: false });
         }
 
-        // Quick Action Buttons (NOS, 2-Step, Ignition)
+        // Quick Action Buttons (NOS, 2-Step, WOT, Purge)
         const nosBtn = document.getElementById('btnActionNos');
         if (nosBtn) {
             const startNos = (e) => {
@@ -362,17 +415,51 @@ class ApexMobileApp {
             twoStepBtn.addEventListener('mouseup', end2Step);
         }
 
+        const wotBtn = document.getElementById('btnActionWot');
+        if (wotBtn) {
+            const toggleWot = (e) => {
+                e.preventDefault();
+                const isActive = wotBtn.classList.toggle('active');
+                this._vibrate(30);
+                const slider = document.getElementById('throttleSlider');
+                const pct = document.getElementById('throttle-pct');
+                if (isActive) {
+                    if (slider) slider.value = 100;
+                    if (pct) pct.textContent = '100%';
+                    if (this.physics) this.physics.setThrottle(1.0);
+                } else {
+                    if (slider) slider.value = 0;
+                    if (pct) pct.textContent = '0%';
+                    if (this.physics) this.physics.setThrottle(0);
+                }
+            };
+            wotBtn.addEventListener('click', toggleWot);
+            wotBtn.addEventListener('touchstart', toggleWot, { passive: false });
+        }
+
+        const purgeActionBtn = document.getElementById('btnActionPurge');
+        if (purgeActionBtn) {
+            const doPurge = (e) => {
+                e.preventDefault();
+                if (this.physics) this.physics.purgeNos();
+                if (this.audio) this.audio.playPurgeSound();
+                this._vibrate([30, 20, 50]);
+            };
+            purgeActionBtn.addEventListener('click', doPurge);
+            purgeActionBtn.addEventListener('touchstart', doPurge, { passive: false });
+        }
+
         const ignBtn = document.getElementById('btnTopIgnition');
         if (ignBtn) {
             ignBtn.addEventListener('click', () => {
                 if (!this.audio) return;
                 if (this.audio.isRunning) {
                     this.audio.stopEngine();
-                    ignBtn.classList.remove('running');
+                    ignBtn.classList.remove('active');
                     this._vibrate(60);
                 } else {
                     this.audio.startEngine();
-                    ignBtn.classList.add('running');
+                    ignBtn.classList.add('active');
                     this._vibrate([40, 30, 80]);
                 }
             });
@@ -464,11 +551,6 @@ class ApexMobileApp {
             infiniteToggle.addEventListener('change', (e) => {
                 const isInf = e.target.checked;
                 if (this.physics) this.physics.nosInfinite = isInf;
-                const statusBadge = document.getElementById('nosStatusBadge');
-                if (statusBadge) {
-                    statusBadge.textContent = isInf ? 'INFINITO' : 'NORMAL';
-                    statusBadge.className = isInf ? 'nos-badge infinite' : 'nos-badge normal';
-                }
                 this._vibrate(25);
             });
         }
@@ -527,29 +609,10 @@ class ApexMobileApp {
 
     _bindSettings() {
         const hapticsToggle = document.getElementById('settingHaptics');
-        const unitToggle = document.getElementById('settingUnit');
-        const volSlider = document.getElementById('settingVolume');
-
         if (hapticsToggle) {
             hapticsToggle.addEventListener('change', (e) => {
                 this.hapticsEnabled = e.target.checked;
                 if (this.hapticsEnabled) this._vibrate(30);
-            });
-        }
-
-        if (unitToggle) {
-            unitToggle.addEventListener('change', (e) => {
-                this.speedUnit = e.target.value;
-                if (this.gauges) this.gauges.isMetric = (this.speedUnit === 'kmh');
-            });
-        }
-
-        if (volSlider) {
-            volSlider.addEventListener('input', (e) => {
-                const vol = parseFloat(e.target.value) / 100;
-                if (this.audio && this.audio.masterGain) {
-                    this.audio.masterGain.gain.setValueAtTime(vol, this.audio.ctx.currentTime);
-                }
             });
         }
     }
@@ -578,13 +641,15 @@ class ApexMobileApp {
         if (!this.physics || !this.physics.currentEngine) return;
         const eng = this.physics.currentEngine;
 
-        const nameEl = document.getElementById('infoEngineName');
-        const specEl = document.getElementById('infoEngineSpec');
-        const redlineEl = document.getElementById('infoEngineRedline');
+        const nameEl = document.getElementById('engine-name');
+        const hpEl = document.getElementById('info-hp');
+        const redlineEl = document.getElementById('info-redline');
+        const boostEl = document.getElementById('info-boost');
 
-        if (nameEl) nameEl.textContent = eng.name;
-        if (specEl) specEl.textContent = `${eng.layout} · ${eng.displacement}L · ${eng.baseHp} CV`;
+        if (nameEl) nameEl.textContent = `${eng.name} (${eng.layout})`;
+        if (hpEl) hpEl.textContent = `${eng.baseHp} CV`;
         if (redlineEl) redlineEl.textContent = `${eng.redline} RPM`;
+        if (boostEl && this.physics.targetBoost) boostEl.textContent = `${this.physics.targetBoost.toFixed(1)} BAR`;
     }
 
     _updateShiftLEDs(rpmNorm, isRedline) {
@@ -596,11 +661,11 @@ class ApexMobileApp {
 
         leds.forEach((led, i) => {
             if (isRedline) {
-                led.className = 'shift-led red flash';
+                led.className = 'shift-led on-red';
             } else if (i < activeCount) {
-                if (i < 5) led.className = 'shift-led green active';
-                else if (i < 9) led.className = 'shift-led yellow active';
-                else led.className = 'shift-led red active';
+                if (i < 5) led.className = 'shift-led on-green';
+                else if (i < 9) led.className = 'shift-led on-yellow';
+                else led.className = 'shift-led on-red';
             } else {
                 led.className = 'shift-led';
             }
@@ -612,17 +677,15 @@ class ApexMobileApp {
         const teleTq = document.getElementById('teleTq');
         const teleBoost = document.getElementById('teleBoost');
         const teleSpeed = document.getElementById('teleSpeed');
-        const teleGear = document.getElementById('teleGear');
-        const gearBadge = document.getElementById('currentGearBadge');
+        const gearDisplay = document.getElementById('gear-display');
 
-        if (teleHp) teleHp.textContent = Math.round(hp);
-        if (teleTq) teleTq.textContent = Math.round(tq);
-        if (teleBoost) teleBoost.textContent = boost.toFixed(2);
-        if (teleSpeed) teleSpeed.textContent = Math.round(speed);
+        if (teleHp) teleHp.textContent = `${Math.round(hp)} CV`;
+        if (teleTq) teleTq.textContent = `${Math.round(tq)} Nm`;
+        if (teleBoost) teleBoost.textContent = `${boost.toFixed(2)} Bar`;
+        if (teleSpeed) teleSpeed.textContent = `${Math.round(speed)} km/h`;
 
         const gearStr = gear === 0 ? 'N' : gear === -1 ? 'R' : `${gear}`;
-        if (teleGear) teleGear.textContent = gearStr;
-        if (gearBadge) gearBadge.textContent = gearStr;
+        if (gearDisplay) gearDisplay.textContent = gearStr;
 
         // NOS Bottle display in NOS Panel
         if (this.physics) {
@@ -630,7 +693,7 @@ class ApexMobileApp {
             const bar = document.getElementById('nosBottleBar');
             const pct = document.getElementById('nosBottlePct');
             if (bar) bar.style.width = `${Math.round(nosLevel * 100)}%`;
-            if (pct) pct.textContent = `${Math.round(nosLevel * 100)}%`;
+            if (pct) pct.textContent = `GARRAFA ${Math.round(nosLevel * 100)}%`;
         }
     }
 
@@ -677,7 +740,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(reg => {
+        navigator.serviceWorker.register('sw.js?v=6').then(reg => {
             console.log('[PWA] Service Worker registrado com sucesso:', reg.scope);
         }).catch(err => {
             console.log('[PWA] Falha ao registrar Service Worker:', err);
